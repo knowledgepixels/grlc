@@ -203,16 +203,15 @@ def dispatchSPARQLQuery(raw_sparql_query, loader, requestArgs, acceptHeader, con
 
     # If there's no mime type, the endpoint is an actual SPARQL endpoint
     else:
-        reqHeaders = {'Accept': acceptHeader}
+        reqHeaders = {'Accept': acceptHeader, 'Content-Type': 'application/sparql-query'}
         if content:
-            reqHeaders = {'Accept': static.mimetypes[content]}
-        data = {'query': rewritten_query}
+            reqHeaders = {'Accept': static.mimetypes[content], 'Content-Type': 'application/sparql-query'}
 
-        glogger.debug('Sending HTTP request to SPARQL endpoint with params: {}'.format(data))
+        glogger.debug('Sending HTTP request to SPARQL endpoint with data: {}'.format(rewritten_query))
         glogger.debug('Sending HTTP request to SPARQL endpoint with headers: {}'.format(reqHeaders))
         glogger.debug('Sending HTTP request to SPARQL endpoint with auth: {}'.format(auth))
         try:
-            response = requests.get(endpoint, params=data, headers=reqHeaders, auth=auth)
+            response = requests.post(endpoint, data=rewritten_query, headers=reqHeaders, auth=auth)
         except Exception as e:
             # Error contacting SPARQL endpoint
             glogger.debug('Exception encountered while connecting to SPARQL endpoint')
